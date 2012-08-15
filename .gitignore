@@ -1,4 +1,4 @@
 .bundle
 .sass-cache
 *.gem
-database.rb
+development.db
