@@ -49,6 +49,12 @@ get '/:id' do
   slim :riddle, layout: false
 end
 
+get '/edit/riddle/:id' do
+  riddle = Riddle.get(params[:id])
+  @riddle = Riddle.new(riddle.attributes.merge(id: nil))
+  slim :new
+end
+
 __END__
 @@layout
 doctype html
@@ -62,6 +68,8 @@ html lang="en"
       h1 
         a href='/' Riddle
       a href='/new/riddle' New Riddle
+      - if @riddle && @riddle.id
+        a.button href="/edit/riddle/#{@riddle.id}" Edit this Riddle
     #main.content
       == yield
 
@@ -76,13 +84,13 @@ html lang="en"
 @@new
 form action="/riddle" method="POST"
   label for="title" Title
-  input#title name="riddle[title]"
+  input#title name="riddle[title]" value="#{@riddle.title}"
   label for="html" HTML
-  textarea#html cols=60 rows=10 name="riddle[html]"
+  textarea#html cols=60 rows=10 name="riddle[html]"=@riddle.html
   label for="css" CSS
-  textarea#css cols=60 rows=10 name="riddle[css]"
+  textarea#css cols=60 rows=10 name="riddle[css]"=@riddle.css
   label for="js" JS
-  textarea#js cols=60 rows=10 name="riddle[js]"
+  textarea#js cols=60 rows=10 name="riddle[js]"=@riddle.js
   input.button type="submit" value="Save"
 
 @@show
