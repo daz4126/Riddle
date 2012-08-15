@@ -1,8 +1,8 @@
 require 'sinatra'
 require 'dm-core'
 require 'dm-migrations'
-require 'dm-timestamps'
 require 'sass'
+require 'redcarpet'
 require 'slim'
 
 configure do
@@ -12,12 +12,7 @@ end
 class Riddle
   include DataMapper::Resource
   property    :id,           Serial
-
-  property :created_at, DateTime
-  property :updated_at, DateTime
-
   property :title,           String
-
   property    :html,         Text
   property    :css,          Text
   property    :js,           Text
@@ -26,12 +21,9 @@ class Riddle
     super(value.empty? ? "Yet another untitled Riddle" : value) 
   end 
 end
-
 DataMapper.finalize
 
-get '/css/styles.css' do
-  scss :styles
-end
+get '/css/styles.css' { scss :styles }
 
 get '/' do
   @riddles = Riddle.all.reverse
@@ -52,8 +44,18 @@ post '/riddle' do
   redirect to("/riddle/#{riddle.id}")
 end
 
+get '/css/riddle/:id/styles.css' do
+  riddle = Riddle.get(params[:id])
+  scss "#riddle #{riddle.css}"
+end
+
+get '/js/riddle/:id/script.js' do
+  riddle = Riddle.get(params[:id])
+  content_type 'text/javascript'
+  render :str, riddle.js, :layout => false
+end
+
 __END__
-########### Views ###########
 @@layout
 doctype html
 html lang="en"
@@ -61,6 +63,9 @@ html lang="en"
       title== @title || 'Riddle'
       meta charset="utf-8"
       link rel="stylesheet" href="/css/styles.css"
+      - if @riddle
+        link rel="stylesheet" href="/css/riddle/#{@riddle.id}/styles.css"
+        script src="/js/riddle/#{@riddle.id}/script.js"
   body
     header role="banner"
       h1 
@@ -78,18 +83,6 @@ html lang="en"
   p No riddles have been created yet!
 
 @@new
-== slim :form
-
-@@show
-h1== @riddle.title
-h2 Markup
-p== @riddle.html
-h2 Styles
-p== @riddle.css
-h2 Javascript
-p== @riddle.js
-
-@@form
 form action="/riddle" method="POST"
   label for="title" Title
   input#title name="riddle[title]"
@@ -100,6 +93,11 @@ form action="/riddle" method="POST"
   label for="js" JS
   textarea#js cols=60 rows=10 name="riddle[js]"
   input.button type="submit" value="Save"
+
+@@show
+h1== @riddle.title
+#riddle
+  == markdown @riddle.html
 
 @@styles
 form label {display: block;}
