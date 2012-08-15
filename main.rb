@@ -23,7 +23,7 @@ class Riddle
 end
 DataMapper.finalize
 
-get '/css/styles.css' { scss :styles }
+get('/css/styles.css'){ scss :styles }
 
 get '/' do
   @riddles = Riddle.all.reverse
@@ -44,15 +44,9 @@ post '/riddle' do
   redirect to("/riddle/#{riddle.id}")
 end
 
-get '/css/riddle/:id/styles.css' do
-  riddle = Riddle.get(params[:id])
-  scss "#riddle #{riddle.css}"
-end
-
-get '/js/riddle/:id/script.js' do
-  riddle = Riddle.get(params[:id])
-  content_type 'text/javascript'
-  render :str, riddle.js, :layout => false
+get '/:id' do
+  @riddle = Riddle.get(params[:id])
+  slim :riddle, layout: false
 end
 
 __END__
@@ -63,9 +57,6 @@ html lang="en"
       title== @title || 'Riddle'
       meta charset="utf-8"
       link rel="stylesheet" href="/css/styles.css"
-      - if @riddle
-        link rel="stylesheet" href="/css/riddle/#{@riddle.id}/styles.css"
-        script src="/js/riddle/#{@riddle.id}/script.js"
   body
     header role="banner"
       h1 
@@ -95,9 +86,23 @@ form action="/riddle" method="POST"
   input.button type="submit" value="Save"
 
 @@show
-h1== @riddle.title
+h1.title== @riddle.title
 #riddle
-  == markdown @riddle.html
+  iframe src="/#{@riddle.id}"
+
+@@riddle
+doctype html
+html lang="en"
+  head
+    title== @riddle.title
+    meta charset="utf-8"
+    style
+      == scss @riddle.css
+    script
+      == @riddle.js
+  body
+    == markdown @riddle.html
 
 @@styles
 form label {display: block;}
+iframe {width: 100%; min-height: 600px; border: none; }
