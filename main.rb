@@ -1,7 +1,6 @@
 require 'sinatra'
 require 'dm-core'
 require 'dm-migrations'
-require 'dm-timestamps'
 require 'sass'
 require 'redcarpet'
 require 'slim'
@@ -85,7 +84,6 @@ post '/riddle' do
 end
 
 __END__
-########### Views ###########
 @@layout
 doctype html
 html lang="en"
