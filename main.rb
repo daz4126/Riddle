@@ -39,7 +39,7 @@ end
 
 DataMapper.finalize
 
-get '/css/styles.css' { scss :styles }
+get('/css/styles.css'){ scss :styles }
 
 get '/css/riddle/:id/styles.css' do
   riddle = Riddle.get(params[:id])
