@@ -89,13 +89,12 @@ doctype html
 html lang="en"
   head
     title== @title || 'Riddle'
-
     meta charset="utf-8"
     link rel="stylesheet" href="/css/styles.css"
   body
     header role="banner"
       h1.logo
-        a href='/' ?Riddle?
+        a href='/' ? Riddle
       a.button href='/new/riddle' New Riddle
       - if @riddle && @riddle.id
         a.button href="/edit/riddle/#{@riddle.id}" Edit this Riddle
