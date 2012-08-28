@@ -19,19 +19,13 @@ end
 class Riddle
   include DataMapper::Resource
   property    :id,           Serial
-
-  property :created_at, DateTime
-  property :updated_at, DateTime
-
-  property :title,           String
-
+  property    :title,        String
   property    :html,         Text
   property    :html_engine,  String
   property    :css,          Text
   property    :css_engine,   String
   property    :js,           Text
   property    :js_engine,    String
-
   def title=(value) 
     super(value.empty? ? "Yet another untitled Riddle" : value) 
   end 
@@ -40,17 +34,6 @@ end
 DataMapper.finalize
 
 get('/css/styles.css'){ scss :styles }
-
-get '/css/riddle/:id/styles.css' do
-  riddle = Riddle.get(params[:id])
-  scss riddle.css
-end
-
-get '/js/riddle/:id/script.js' do
-  riddle = Riddle.get(params[:id])
-  content_type 'text/javascript'
-  render :str, riddle.js, :layout => false
-end
 
 get '/' do
   @riddles = Riddle.all.reverse
@@ -144,7 +127,7 @@ h1.title== @riddle.title
 doctype html
 html lang="en"
   head
-    title== @riddle.title
+    title== @riddle.title || 'Riddle'
     meta charset="utf-8"
     style
       - if @riddle.css_engine =="css"
